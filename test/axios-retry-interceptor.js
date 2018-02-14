@@ -32,7 +32,7 @@ describe('Axios Interceptors', () => {
         })
         .catch((err) => {
           expect(err.config.__isRetryRequest).to.be.true;
-          expect(err.config.__retryCount).to.be.equal((3 + 1));
+          expect(err.config.__retryCount).to.be.equal(3);
         });
     });
 
@@ -54,6 +54,40 @@ describe('Axios Interceptors', () => {
           expect(timeTaken).to.be.above(3000);
           expect(timeTaken).to.be.below(3500);
           expect(err.config.waitTime).to.be.equal(1000);
+        });
+    });
+
+    it('should retry only for {statuses} in config', () => {
+      options = Object.assign(options, {
+        maxAttempts: 1, // TODO - test with more
+        statuses: [401]
+      });
+
+      retryInterceptor(http, options);
+
+      http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+          // do nothing
+        })
+        .catch((err) => {
+          expect(err.config.__isRetryRequest).to.be.true;
+          expect(err.config.__retryCount).to.be.equal(1);
+        });
+    });
+
+    it('should not retry for status not in {statuses} config', () => {
+      options = Object.assign(options, {
+        maxAttempts: 0, // TODO - test with more
+        statuses: [500]
+      });
+
+      retryInterceptor(http, options);
+
+      http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+        })
+        .catch((err) => { // eslint-disable-line no-unused-vars
+          expect(err.config.__isRetryRequest).to.equal(undefined);
         });
     });
   });
