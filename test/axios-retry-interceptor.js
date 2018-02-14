@@ -36,7 +36,7 @@ describe('Axios Interceptors', () => {
         });
     });
 
-    it.only('should wait {waitTime} between each retry', () => {
+    it('should wait {waitTime} between each retry', () => {
       const start = new Date().getTime();
       options = {
         maxAttempts: 3,
