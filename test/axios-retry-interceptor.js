@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import axios from 'axios';
 import nock from 'nock';
-import retryInterceptor from '../src/axios-retry-interceptor';
+import axiosRetryInterceptor from '../src/axios-retry-interceptor';
 
 describe('Axios Interceptors', () => {
   describe('Retry Interceptor', () => {
@@ -15,7 +15,7 @@ describe('Axios Interceptors', () => {
       nock(BASE_URL)
         .persist()
         .get(ENDPOINT)
-        .reply(401);
+        .reply(408);
 
       http = axios.create({ baseURL: BASE_URL });
 
@@ -25,7 +25,7 @@ describe('Axios Interceptors', () => {
     });
 
     it('should retry {maxAttempts} times in config', () => {
-      retryInterceptor(http, options);
+      axiosRetryInterceptor(http, options);
 
       return http.get(ENDPOINT)
         .then((res) => { // eslint-disable-line no-unused-vars
@@ -40,32 +40,32 @@ describe('Axios Interceptors', () => {
     it('should wait {waitTime} between each retry', () => {
       const start = new Date().getTime();
       options = {
-        maxAttempts: 3,
-        waitTime: 1000
+        maxAttempts: 2,
+        waitTime: 500
       };
-      retryInterceptor(http, options);
+      axiosRetryInterceptor(http, options);
 
       return http.get(ENDPOINT)
         .then((res) => { // eslint-disable-line no-unused-vars
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
-          expect(err.config.__retryCount).to.be.equal(3);
+          expect(err.config.__retryCount).to.be.equal(2);
           const end = new Date().getTime();
           const timeTaken = end - start;
-          expect(timeTaken).to.be.above(3000);
-          expect(timeTaken).to.be.below(3500);
-          expect(err.config.waitTime).to.be.equal(1000);
+          expect(timeTaken).to.be.above(options.maxAttempts * options.waitTime);
+          expect(timeTaken).to.be.below((options.maxAttempts * options.waitTime) + 500);
+          expect(err.config.waitTime).to.be.equal(500);
         });
     }).timeout(5000);
 
     it('should retry only for {statuses} in config', () => {
       options = Object.assign(options, {
         maxAttempts: 3,
-        statuses: [401]
+        statuses: [408]
       });
 
-      retryInterceptor(http, options);
+      axiosRetryInterceptor(http, options);
 
       return http.get(ENDPOINT)
         .then((res) => { // eslint-disable-line no-unused-vars
@@ -83,7 +83,7 @@ describe('Axios Interceptors', () => {
         statuses: [500]
       });
 
-      retryInterceptor(http, options);
+      axiosRetryInterceptor(http, options);
 
       return http.get(ENDPOINT)
         .then((res) => { // eslint-disable-line no-unused-vars

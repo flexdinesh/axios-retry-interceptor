@@ -1,6 +1,6 @@
-import retryInterceptor from './axios-retry-interceptor';
+import axiosRetryInterceptor from './axios-retry-interceptor';
 
 export {
-  retryInterceptor
+  axiosRetryInterceptor
 };
-export default retryInterceptor;
+export default axiosRetryInterceptor;

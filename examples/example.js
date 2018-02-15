@@ -1,10 +1,15 @@
 /* eslint-disable no-console */
 const axios = require('axios');
-const addRetryInterceptor = require('axios-retry-interceptor');
+const axiosRetryInterceptor = require('axios-retry-interceptor');
 
-addRetryInterceptor(axios, {
+const http = axios.create({
+  // options
+});
+
+axiosRetryInterceptor(http, {
   maxAttempts: 3,
-  waitTime: 1000 // in milliseconds
+  waitTime: 1000, // in milliseconds
+  statuses: [408, 522] // [] for all errors
 });
 
 // all failed http calls will now be retried 3 times

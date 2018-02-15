@@ -21,7 +21,7 @@ const shouldRetry = (error) => {
   return false;
 };
 
-const retryInterceptor = (axios, options) => {
+const axiosRetryInterceptor = (axios, options) => {
   const defaultOptions = {
     maxAttempts: 0,
     waitTime: 0,
@@ -54,4 +54,4 @@ const retryInterceptor = (axios, options) => {
   });
 };
 
-export default retryInterceptor;
+export default axiosRetryInterceptor;
