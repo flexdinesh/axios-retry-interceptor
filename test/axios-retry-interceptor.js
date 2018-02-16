@@ -4,7 +4,7 @@ import axios from 'axios';
 import nock from 'nock';
 import axiosRetryInterceptor from '../src/axios-retry-interceptor';
 
-describe('Axios Interceptors', () => {
+describe('Axios Retry Interceptor', () => {
   const BASE_URL = 'http://localhost:1313';
   const ENDPOINT = '/';
   let http;
