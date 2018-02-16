@@ -5,27 +5,88 @@ import nock from 'nock';
 import axiosRetryInterceptor from '../src/axios-retry-interceptor';
 
 describe('Axios Interceptors', () => {
-  describe('Retry Interceptor', () => {
-    const BASE_URL = 'http://localhost:1313';
-    const ENDPOINT = '/';
-    let http;
-    let options;
+  const BASE_URL = 'http://localhost:1313';
+  const ENDPOINT = '/';
+  let http;
+  let options;
 
-    beforeEach(() => {
+  beforeEach(() => {
+    nock(BASE_URL)
+      .persist()
+      .get(ENDPOINT)
+      .reply(500, {});
+
+    http = axios.create({ baseURL: BASE_URL });
+  });
+
+  describe('Retry Checks', () => {
+    options = {
+      maxAttempts: 2
+    };
+
+    it('should retry http call when request fails', () => {
+      axiosRetryInterceptor(http, options);
+
+      return http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+          throw new Error('promise should have been rejected');
+        })
+        .catch((err) => {
+          expect(err.config.__isRetryRequest).to.be.true;
+        });
+    });
+
+    it('should retry http call only for 5xx status', () => {
+      axiosRetryInterceptor(http, options);
+
+      return http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+          throw new Error('promise should have been rejected');
+        })
+        .catch((err) => {
+          expect(err.config.__isRetryRequest).to.be.true;
+          expect(err.response.status).to.be.equal(500);
+        });
+    });
+
+    it('should not retry http call if status is not 5xx', () => {
+      nock.cleanAll();
       nock(BASE_URL)
         .persist()
         .get(ENDPOINT)
-        .reply(408);
+        .reply(401, {});
 
-      http = axios.create({ baseURL: BASE_URL });
+      axiosRetryInterceptor(http, options);
 
-      options = {
-        maxAttempts: 3
-      };
+      return http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+          throw new Error('promise should have been rejected');
+        })
+        .catch((err) => {
+          expect(err.config.__isRetryRequest).to.equal(undefined);
+          expect(err.response.status).to.be.equal(401);
+        });
+    });
+  });
+
+  describe('Config Checks', () => {
+    it('should retry {maxAttempts} times in config', () => {
+      axiosRetryInterceptor(http, {
+        maxAttempts: 2
+      });
+
+      return http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+          throw new Error('promise should have been rejected');
+        })
+        .catch((err) => {
+          expect(err.config.__isRetryRequest).to.be.true;
+          expect(err.config.__retryCount).to.be.equal(2);
+        });
     });
 
-    it('should retry {maxAttempts} times in config', () => {
-      axiosRetryInterceptor(http, options);
+    it('should retry default-3 times when {maxAttempts} is not specified', () => {
+      axiosRetryInterceptor(http, {});
 
       return http.get(ENDPOINT)
         .then((res) => { // eslint-disable-line no-unused-vars
@@ -59,7 +120,33 @@ describe('Axios Interceptors', () => {
         });
     }).timeout(5000);
 
+    it('should not wait between retries when {waitTime} is not specified', () => {
+      const start = new Date().getTime();
+      options = {
+        maxAttempts: 2,
+      };
+      axiosRetryInterceptor(http, options);
+
+      return http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+          throw new Error('promise should have been rejected');
+        })
+        .catch((err) => {
+          expect(err.config.__retryCount).to.be.equal(2);
+          const end = new Date().getTime();
+          const timeTaken = end - start;
+          expect(timeTaken).to.be.below(200);
+          expect(err.config.waitTime).to.be.equal(0);
+        });
+    });
+
     it('should retry only for {statuses} in config', () => {
+      nock.cleanAll();
+      nock(BASE_URL)
+        .persist()
+        .get(ENDPOINT)
+        .reply(408, {});
+
       options = Object.assign(options, {
         maxAttempts: 3,
         statuses: [408]
@@ -80,7 +167,7 @@ describe('Axios Interceptors', () => {
     it('should not retry for status not in {statuses} config', () => {
       options = Object.assign(options, {
         maxAttempts: 1, // TODO - test with more
-        statuses: [500]
+        statuses: [505]
       });
 
       axiosRetryInterceptor(http, options);
@@ -91,6 +178,20 @@ describe('Axios Interceptors', () => {
         })
         .catch((err) => {
           expect(err.config.__isRetryRequest).to.equal(undefined);
+        });
+    });
+
+    it('should work with default config, when options are not passed', () => {
+      axiosRetryInterceptor(http);
+
+      return http.get(ENDPOINT)
+        .then((res) => { // eslint-disable-line no-unused-vars
+          throw new Error('promise should have been rejected');
+        })
+        .catch((err) => {
+          expect(err.config.__isRetryRequest).to.be.true;
+          expect(err.config.__retryCount).to.be.equal(3);
+          expect(err.config.waitTime).to.be.equal(0);
         });
     });
   });

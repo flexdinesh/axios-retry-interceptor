@@ -1,29 +1,38 @@
 /* eslint-disable max-len */
 import t from 'typy';
 
-const shouldRetry = (error) => {
-  const retryCount = error.config.__retryCount || 0; // eslint-disable-line prefer-destructuring
-  const { maxAttempts } = error.config;
+const ALLOWED_RETRY_METHODS = ['get', 'put', 'delete', 'head', 'options'];
 
+const shouldRetry = (error) => {
+  const { method: httpMethod, statuses } = error.config;
+  const { maxAttempts, __retryCount: retryCount = 0 } = error.config;
+  const { response: { status: statusCode } = {} } = error;
+
+  let shouldRetryForMethod = false;
   let shouldRetryForStatus = false;
+
+  if (ALLOWED_RETRY_METHODS.includes(httpMethod)) shouldRetryForMethod = true;
+
   if (
-    error.config.statuses.length === 0 ||
-    error.config.statuses.includes(t(error, 'response.status').safeObject)
+    (statuses.length === 0 && statusCode >= 500 && statusCode < 600) ||
+    statuses.includes(statusCode)
   ) {
     shouldRetryForStatus = true;
   }
 
-  if (retryCount < maxAttempts && shouldRetryForStatus) {
-    error.config.__isRetryRequest = true;
-    error.config.__retryCount = retryCount + 1;
+  if (
+    shouldRetryForMethod && shouldRetryForStatus &&
+    retryCount < maxAttempts
+  ) {
     return true;
   }
+
   return false;
 };
 
-const axiosRetryInterceptor = (axios, options) => {
+const axiosRetryInterceptor = (axios, options = {}) => {
   const defaultOptions = {
-    maxAttempts: 0,
+    maxAttempts: 3,
     waitTime: 0,
     statuses: []
   };
@@ -41,7 +50,11 @@ const axiosRetryInterceptor = (axios, options) => {
 
   axios.interceptors.response.use(null, (error) => {
     if (t(error.config).isDefined && shouldRetry(error)) {
+      const { __retryCount: retryCount = 0 } = error.config;
+      error.config.__retryCount = retryCount + 1;
+      error.config.__isRetryRequest = true;
       const waitTime = t(error.config.waitTime).isNumber ? error.config.waitTime : 0;
+
       if (waitTime > 0) {
         // eslint-disable-next-line no-unused-vars
         return new Promise((resolve, reject) => {
