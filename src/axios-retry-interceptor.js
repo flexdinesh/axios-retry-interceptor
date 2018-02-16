@@ -1,6 +1,12 @@
 /* eslint-disable max-len */
 import t from 'typy';
 
+const DEFAULT_OPTIONS = {
+  maxAttempts: 3,
+  waitTime: 0,
+  statuses: []
+};
+
 const ALLOWED_RETRY_METHODS = ['get', 'put', 'delete', 'head', 'options'];
 
 const shouldRetry = (error) => {
@@ -31,16 +37,10 @@ const shouldRetry = (error) => {
 };
 
 const axiosRetryInterceptor = (axios, options = {}) => {
-  const defaultOptions = {
-    maxAttempts: 3,
-    waitTime: 0,
-    statuses: []
-  };
-
   const retryConfig = {
-    maxAttempts: t(options.maxAttempts).isNumber ? options.maxAttempts : defaultOptions.maxAttempts,
-    waitTime: t(options.waitTime).isNumber ? options.waitTime : defaultOptions.waitTime,
-    statuses: t(options.statuses).isArray ? options.statuses : defaultOptions.statuses
+    maxAttempts: t(options.maxAttempts).isNumber ? options.maxAttempts : DEFAULT_OPTIONS.maxAttempts,
+    waitTime: t(options.waitTime).isNumber ? options.waitTime : DEFAULT_OPTIONS.waitTime,
+    statuses: t(options.statuses).isArray ? options.statuses : DEFAULT_OPTIONS.statuses
   };
 
   axios.interceptors.request.use(
