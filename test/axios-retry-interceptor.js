@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-expressions */
+/* eslint-disable no-unused-expressions, no-unused-vars */
 import { expect } from 'chai';
 import axios from 'axios';
 import nock from 'nock';
@@ -27,8 +27,9 @@ describe('Axios Retry Interceptor', () => {
     it('should retry http call when request fails', () => {
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -39,8 +40,9 @@ describe('Axios Retry Interceptor', () => {
     it('should retry http call only for 5xx status', () => {
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -58,8 +60,9 @@ describe('Axios Retry Interceptor', () => {
 
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -77,11 +80,12 @@ describe('Axios Retry Interceptor', () => {
 
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
+      return http
+        .get(ENDPOINT)
         .then((res) => {
           expect(res.status).to.be.equal(200);
         })
-        .catch((err) => { // eslint-disable-line no-unused-vars
+        .catch((err) => {
           throw new Error('promise should not have been rejected');
         });
     });
@@ -93,8 +97,9 @@ describe('Axios Retry Interceptor', () => {
         maxAttempts: 2
       });
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -106,8 +111,9 @@ describe('Axios Retry Interceptor', () => {
     it('should retry default-3 times when {maxAttempts} is not specified', () => {
       axiosRetryInterceptor(http, {});
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -124,8 +130,9 @@ describe('Axios Retry Interceptor', () => {
       };
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -141,12 +148,13 @@ describe('Axios Retry Interceptor', () => {
     it('should not wait between retries when {waitTime} is not specified', () => {
       const start = new Date().getTime();
       options = {
-        maxAttempts: 2,
+        maxAttempts: 2
       };
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -172,8 +180,9 @@ describe('Axios Retry Interceptor', () => {
 
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -190,8 +199,9 @@ describe('Axios Retry Interceptor', () => {
 
       axiosRetryInterceptor(http, options);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {
@@ -202,8 +212,9 @@ describe('Axios Retry Interceptor', () => {
     it('should work with default config, when options are not passed', () => {
       axiosRetryInterceptor(http);
 
-      return http.get(ENDPOINT)
-        .then((res) => { // eslint-disable-line no-unused-vars
+      return http
+        .get(ENDPOINT)
+        .then((res) => {
           throw new Error('promise should have been rejected');
         })
         .catch((err) => {

@@ -26,10 +26,7 @@ const shouldRetry = (error) => {
     shouldRetryForStatus = true;
   }
 
-  if (
-    shouldRetryForMethod && shouldRetryForStatus &&
-    retryCount < maxAttempts
-  ) {
+  if (shouldRetryForMethod && shouldRetryForStatus && retryCount < maxAttempts) {
     return true;
   }
 
@@ -38,7 +35,9 @@ const shouldRetry = (error) => {
 
 const axiosRetryInterceptor = (axios, options = {}) => {
   const retryConfig = {
-    maxAttempts: t(options.maxAttempts).isNumber ? options.maxAttempts : DEFAULT_OPTIONS.maxAttempts,
+    maxAttempts: t(options.maxAttempts).isNumber
+      ? options.maxAttempts
+      : DEFAULT_OPTIONS.maxAttempts,
     waitTime: t(options.waitTime).isNumber ? options.waitTime : DEFAULT_OPTIONS.waitTime,
     statuses: t(options.statuses).isArray ? options.statuses : DEFAULT_OPTIONS.statuses
   };
