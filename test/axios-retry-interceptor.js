@@ -67,6 +67,24 @@ describe('Axios Retry Interceptor', () => {
           expect(err.response.status).to.be.equal(401);
         });
     });
+
+    it('should not attempt retry checks for successful response', () => {
+      nock.cleanAll();
+      nock(BASE_URL)
+        .persist()
+        .get(ENDPOINT)
+        .reply(200, {});
+
+      axiosRetryInterceptor(http, options);
+
+      return http.get(ENDPOINT)
+        .then((res) => {
+          expect(res.status).to.be.equal(200);
+        })
+        .catch((err) => { // eslint-disable-line no-unused-vars
+          throw new Error('promise should not have been rejected');
+        });
+    });
   });
 
   describe('Config Checks', () => {
