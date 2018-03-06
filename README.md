@@ -59,9 +59,9 @@ _Default_: 0
 
 _Example_: `waitTime: 3000`
 
-#### statuses
+#### errorCodes
 
-Response statuses for which the interceptor should retry.
+Response errorCodes for which the interceptor should retry.
 
 Ideally any implementation should retry only 5xx status(server errors) and should not retry 4xx status(client errors). The reason is, if a http call fails with a client error, then the retry call will have the same headers/params and will obviously fail. So **by default all 5xx errors will be retried**. If you want to customize the status for which the retries should be made, use this config.
 
@@ -69,7 +69,7 @@ _Type_: Array
 
 _Default_: []
 
-_Example_: `[500, 501, 401]`
+_Example_: `errorCodes: [500, 501, 401]`
 
 ## Author's note
 

@@ -166,7 +166,7 @@ describe('Axios Retry Interceptor', () => {
         });
     });
 
-    it('should retry only for {statuses} in config', () => {
+    it('should retry only for {errorCodes} in config', () => {
       nock.cleanAll();
       nock(BASE_URL)
         .persist()
@@ -175,7 +175,7 @@ describe('Axios Retry Interceptor', () => {
 
       options = Object.assign(options, {
         maxAttempts: 3,
-        statuses: [408]
+        errorCodes: [408]
       });
 
       axiosRetryInterceptor(http, options);
@@ -191,10 +191,10 @@ describe('Axios Retry Interceptor', () => {
         });
     });
 
-    it('should not retry for status not in {statuses} config', () => {
+    it('should not retry for status not in {errorCodes} config', () => {
       options = Object.assign(options, {
         maxAttempts: 1,
-        statuses: [505]
+        errorCodes: [505]
       });
 
       axiosRetryInterceptor(http, options);

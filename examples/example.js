@@ -8,7 +8,7 @@ const http = axios.create({
 axiosRetryInterceptor(http, {
   maxAttempts: 3,
   waitTime: 1000, // in milliseconds
-  statuses: [408, 522] // [] for all errors
+  errorCodes: [408, 522] // [] for all errors
 });
 
 // all failed http calls will now be retried 3 times

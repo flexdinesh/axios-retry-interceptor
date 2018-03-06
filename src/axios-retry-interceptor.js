@@ -4,13 +4,13 @@ import t from 'typy';
 const DEFAULT_OPTIONS = {
   maxAttempts: 3,
   waitTime: 0,
-  statuses: []
+  errorCodes: []
 };
 
 const ALLOWED_RETRY_METHODS = ['get', 'put', 'delete', 'head', 'options'];
 
 const shouldRetry = (error) => {
-  const { method: httpMethod, statuses } = error.config;
+  const { method: httpMethod, errorCodes } = error.config;
   const { maxAttempts, __retryCount: retryCount = 0 } = error.config;
   const { response: { status: statusCode } = {} } = error;
 
@@ -20,8 +20,8 @@ const shouldRetry = (error) => {
   if (ALLOWED_RETRY_METHODS.includes(httpMethod)) shouldRetryForMethod = true;
 
   if (
-    (statuses.length === 0 && statusCode >= 500 && statusCode < 600) ||
-    statuses.includes(statusCode)
+    (errorCodes.length === 0 && statusCode >= 500 && statusCode < 600) ||
+    errorCodes.includes(statusCode)
   ) {
     shouldRetryForStatus = true;
   }
@@ -39,7 +39,7 @@ const axiosRetryInterceptor = (axios, options = {}) => {
       ? options.maxAttempts
       : DEFAULT_OPTIONS.maxAttempts,
     waitTime: t(options.waitTime).isNumber ? options.waitTime : DEFAULT_OPTIONS.waitTime,
-    statuses: t(options.statuses).isArray ? options.statuses : DEFAULT_OPTIONS.statuses
+    errorCodes: t(options.errorCodes).isArray ? options.errorCodes : DEFAULT_OPTIONS.errorCodes
   };
 
   axios.interceptors.request.use(
