@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const axios = require('axios');
 const axiosRetryInterceptor = require('axios-retry-interceptor');
 
