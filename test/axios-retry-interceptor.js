@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import axios from 'axios';
 import nock from 'nock';
-import axiosRetryInterceptor from '../src/axios-retry-interceptor';
+import axiosRetryInterceptor from '../src';
 
 describe('Axios Retry Interceptor', () => {
   const BASE_URL = 'http://localhost:1313';
