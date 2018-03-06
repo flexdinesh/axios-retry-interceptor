@@ -23,11 +23,11 @@
     "url": "git+https://github.com/flexdinesh/axios-retry-interceptor.git"
   },
   "keywords": [
-    "boilerplate",
-    "npm",
-    "module",
-    "node",
-    "javascript"
+    "axios",
+    "interceptor",
+    "http",
+    "retry",
+    "middleware"
   ],
   "author": "Dinesh Pandiyan <flexdinesh@gmail.com>",
   "license": "MIT",
