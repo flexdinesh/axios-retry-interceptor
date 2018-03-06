@@ -1,6 +1,7 @@
 # Axios Retry Interceptor
 [![Build Status](https://travis-ci.org/flexdinesh/axios-retry-interceptor.svg?branch=master)](https://travis-ci.org/flexdinesh/axios-retry-interceptor)
 [![dependencies Status](https://david-dm.org/flexdinesh/axios-retry-interceptor/status.svg)](https://david-dm.org/flexdinesh/axios-retry-interceptor)
+[![npm version](https://badge.fury.io/js/axios-retry-interceptor.svg)](https://www.npmjs.com/package/axios-retry-interceptor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Configurable Axios Interceptor to retry failed http calls.
