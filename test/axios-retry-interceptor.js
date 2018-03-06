@@ -193,7 +193,7 @@ describe('Axios Retry Interceptor', () => {
 
     it('should not retry for status not in {statuses} config', () => {
       options = Object.assign(options, {
-        maxAttempts: 1, // TODO - test with more
+        maxAttempts: 1,
         statuses: [505]
       });
 
