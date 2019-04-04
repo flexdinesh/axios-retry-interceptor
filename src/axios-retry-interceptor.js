@@ -54,13 +54,10 @@ const axiosRetryInterceptor = (axios, options = {}) => {
       error.config.__isRetryRequest = true;
       const waitTime = t(error.config.waitTime).isNumber ? error.config.waitTime : 0;
 
-      if (waitTime > 0) {
-        // eslint-disable-next-line no-unused-vars
-        return new Promise((resolve, reject) => {
-          setTimeout(() => resolve(axios(error.config)), waitTime);
-        });
-      }
-      return axios(error.config);
+      // eslint-disable-next-line no-unused-vars
+      return new Promise((resolve, reject) => {
+        setTimeout(() => resolve(axios(error.config)), waitTime);
+      });
     }
     return Promise.reject(error);
   });
